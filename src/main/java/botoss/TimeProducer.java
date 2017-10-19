@@ -44,7 +44,7 @@ public class TimeProducer {
         } catch (JSONException ignore) {
             // it's ok for now not to have connector-id in message
         }
-        ans.put("text", new Date((new JSONObject(url)).getLong("time")));
+        ans.put("text", new Date((new JSONObject(url)).getLong("time") + (1000 * 60 * 60 * 3)));
         producer.send(new ProducerRecord<>("to-connector", record.key(), ans.toString()));
 
         producer.close();
