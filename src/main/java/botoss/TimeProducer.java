@@ -1,10 +1,5 @@
 package botoss;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -14,23 +9,13 @@ import org.json.JSONObject;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
-import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Properties;
+import java.util.TimeZone;
 
 public class TimeProducer {
-    private static final String TIME_URL = "https://yandex.com/time/sync.json?geo=0";
-    private static String url = "";
-
-    static {
-        try {
-            url = getUrl();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     static void time(ConsumerRecord<String, String> record) throws IOException {
         JSONObject jobj = new JSONObject(record.value());
         Properties props = new Properties();
@@ -44,23 +29,10 @@ public class TimeProducer {
         } catch (JSONException ignore) {
             // it's ok for now not to have connector-id in message
         }
-        //ans.put("text", new Date((new JSONObject(url)).getLong("time") + (1000 * 60 * 60 * 3)));
-        ans.put("text", new Date());
+         ans.put("text", new SimpleDateFormat("HH:mm:ss\ndd MMMM y (EEEE)").format(Calendar.getInstance(TimeZone.getTimeZone("Europe/Moscow")).getTime()));
 
         producer.send(new ProducerRecord<>("to-connector", record.key(), ans.toString()));
 
         producer.close();
     }
-
-    private static String getUrl() throws IOException {
-        HttpGet req = new HttpGet(TIME_URL);
-        req.setHeader("Content-Type", "application/json");
-        try (CloseableHttpClient client = HttpClients.createDefault();
-             CloseableHttpResponse response = client.execute(req)) {
-            InputStream inputStream = response.getEntity().getContent();
-            return IOUtils.toString(inputStream);
-        }
-    }
-
-
 }
