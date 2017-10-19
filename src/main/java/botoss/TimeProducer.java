@@ -10,8 +10,9 @@ import org.json.JSONObject;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -29,7 +30,9 @@ public class TimeProducer {
         } catch (JSONException ignore) {
             // it's ok for now not to have connector-id in message
         }
-         ans.put("text", new SimpleDateFormat("HH:mm:ss\ndd MMMM y (EEEE)").format(Calendar.getInstance(TimeZone.getTimeZone("Europe/Moscow")).getTime()));
+        DateFormat date = new SimpleDateFormat("HH:mm:ss\ndd MMMM y (EEEE)");
+        date.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        ans.put("text", date.format(new Date()));
 
         producer.send(new ProducerRecord<>("to-connector", record.key(), ans.toString()));
 
