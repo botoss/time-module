@@ -18,7 +18,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 public class TimeProducer {
-    public static final String DATE_FORMAT = "HH:mm:ss (zZ)\ndd MMMM y (EEEE)";
+    public static final String DATE_FORMAT = "HH:mm:ss (z)\ndd MMMM y (EEEE)";
     public static final String DEFAULT_TIME_ZONE = "Europe/Moscow";
     static void time(ConsumerRecord<String, String> record) throws IOException {
         JSONObject jobj = new JSONObject(record.value());

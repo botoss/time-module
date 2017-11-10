@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Consumer {
@@ -24,9 +25,13 @@ public class Consumer {
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);
             for (ConsumerRecord<String, String> record : records) {
-                String command = (new JSONObject(record.value())).getString("command");
-                if (rateCommand(command)) {
-                    TimeProducer.time(record);
+                try {
+                    String command = (new JSONObject(record.value())).getString("command");
+                    if (rateCommand(command)) {
+                        TimeProducer.time(record);
+                    }
+                } catch (JSONException e) {
+                    continue;
                 }
             }
         }
